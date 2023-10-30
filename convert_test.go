@@ -393,10 +393,11 @@ func TestConvertPrimitiveOfDifferentTypes(t *testing.T) {
 	assert.EqualValues(t, 0, got)
 }
 
-func TestConvertTtToEn(t *testing.T) {
+func TestConvertSrcWithAliasToDstWithoutAlias(t *testing.T) {
 	ui := UUID("eee")
 	b := Book{
 		ID:     UUID("ooo"),
+		Pages:  Pages(34),
 		UserID: &ui,
 	}
 
@@ -404,10 +405,100 @@ func TestConvertTtToEn(t *testing.T) {
 	convert.SrcToDst(b, &actual)
 
 	expected := BookEntity{
-		ID:     "eee",
-		UserID: "ooo",
+		ID:     "ooo",
+		Pages:  34,
+		UserID: "eee",
 	}
 	assert.Equal(t, expected, actual)
+}
+
+func TestConvertSrcWithoutAliasToDstWithAlias(t *testing.T) {
+	b := BookEntity{
+		ID:     "ooo",
+		Pages:  34,
+		UserID: "eee",
+	}
+
+	var actual Book
+	convert.SrcToDst(b, &actual)
+
+	ui := UUID("eee")
+	expected := Book{
+		ID:     UUID("ooo"),
+		Pages:  Pages(34),
+		UserID: &ui,
+	}
+	assert.Equal(t, expected, actual)
+}
+
+func TestConvertSrcWithoutAliasToDstWithSliceOfAlias(t *testing.T) {
+	b := BookEntity{
+		ID:     "ooo",
+		Pages:  34,
+		UserID: "eee",
+	}
+
+	var actual Book
+	convert.SrcToDst(b, &actual)
+
+	ui := UUID("eee")
+	expected := Book{
+		ID:     UUID("ooo"),
+		Pages:  Pages(34),
+		UserID: &ui,
+	}
+	assert.Equal(t, expected, actual)
+}
+
+func TestConvertSrcWithAliasSliceToDstWithSliceWithoutAlias(t *testing.T) {
+	q := Query{Filters: []string{"id", "name", "date"}}
+
+	var actual QueryEntity
+	convert.SrcToDst(q, &actual)
+
+	expected := QueryEntity{Filters: []string{"id", "name", "date"}}
+
+	assert.Equal(t, actual, expected)
+}
+
+func TestConvertSrcWithSlicesAToDstWithSliceAndAlias(t *testing.T) {
+	q := QueryEntity{Filters: []string{"id", "name", "date"}}
+
+	var actual Query
+	convert.SrcToDst(q, &actual)
+
+	expected := Query{Filters: []string{"id", "name", "date"}}
+
+	assert.Equal(t, actual, expected)
+}
+
+//func TestConvertSrcWithSliceOfStructToDstWithSliceOfStruct(t *testing.T) {
+//	src := MyTemplates{
+//		Templates: []Template{
+//			{Categories: []string{"111", "222"}},
+//			{Categories: []string{"333", "444"}},
+//		},
+//	}
+//
+//	var actual MyNewTemplates
+//	convert.SrcToDst(src, &actual)
+//
+//	expected := MyNewTemplates{
+//		Templates: []NewTemplate{
+//			{Categories: []string{"111", "222"}},
+//			{Categories: []string{"333", "444"}},
+//		},
+//	}
+//
+//	assert.Equal(t, expected, actual)
+//}
+
+type MyTemplates struct {
+	Templates []Template
+}
+
+type MyNewTemplates struct {
+	Templates []NewTemplate
 }
 
 type User struct {
@@ -471,12 +562,26 @@ type MyIntEntity int64
 
 type UUID string
 
+type Pages int
+
 type Book struct {
 	ID     UUID
+	Pages  Pages
 	UserID *UUID
 }
 
 type BookEntity struct {
 	ID     string
+	Pages  int
 	UserID string
+}
+
+type Filters []string
+
+type Query struct {
+	Filters Filters
+}
+
+type QueryEntity struct {
+	Filters []string
 }

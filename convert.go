@@ -117,7 +117,14 @@ func setFields(srcField reflect.Value, dstField reflect.Value) {
 	}
 
 	if dstField.CanSet() {
-		dstField.Set(srcField)
+		if !srcField.Type().ConvertibleTo(dstField.Type()) {
+			return
+		}
+
+		srcField = srcField.Convert(dstField.Type())
+		if dstField.CanSet() {
+			dstField.Set(srcField)
+		}
 	}
 }
 
