@@ -74,6 +74,28 @@ func setStructures(srcValue reflect.Value, dstValue reflect.Value) {
 			continue
 		}
 
+		// if the field of the struct is slice of structs
+		if (srcField.Kind() == reflect.Slice) && (srcField.Type().Elem().Kind() == reflect.Struct) {
+			if dstField.Kind() != reflect.Slice {
+				return
+			}
+
+			//fmt.Println(dstField.Type())
+			//fmt.Println(dstField.Kind())
+			//fmt.Println(dstField.Type().Elem().Name())
+
+			dstStrcuts := reflect.MakeSlice(dstField.Type(), srcField.Len(), srcField.Len())
+
+			for j := 0; j < srcField.Len(); j++ {
+				srcElemValue := srcField.Index(j)
+
+				setStructures(srcElemValue, dstStrcuts.Index(j))
+			}
+
+			dstField.Set(dstStrcuts)
+			continue
+		}
+
 		setFields(srcField, dstField)
 	}
 

@@ -472,26 +472,26 @@ func TestConvertSrcWithSlicesAToDstWithSliceAndAlias(t *testing.T) {
 	assert.Equal(t, actual, expected)
 }
 
-//func TestConvertSrcWithSliceOfStructToDstWithSliceOfStruct(t *testing.T) {
-//	src := MyTemplates{
-//		Templates: []Template{
-//			{Categories: []string{"111", "222"}},
-//			{Categories: []string{"333", "444"}},
-//		},
-//	}
-//
-//	var actual MyNewTemplates
-//	convert.SrcToDst(src, &actual)
-//
-//	expected := MyNewTemplates{
-//		Templates: []NewTemplate{
-//			{Categories: []string{"111", "222"}},
-//			{Categories: []string{"333", "444"}},
-//		},
-//	}
-//
-//	assert.Equal(t, expected, actual)
-//}
+func TestConvertSrcWithSliceOfStructToDstWithSliceOfStruct(t *testing.T) {
+	src := MyTemplates{
+		Templates: []Template{
+			{Categories: []string{"111", "222"}},
+			{Categories: []string{"333", "444"}},
+		},
+	}
+
+	var actual MyNewTemplates
+	convert.SrcToDst(src, &actual)
+
+	expected := MyNewTemplates{
+		Templates: []NewTemplate{
+			{Categories: []string{"111", "222"}},
+			{Categories: []string{"333", "444"}},
+		},
+	}
+
+	assert.Equal(t, expected, actual)
+}
 
 type MyTemplates struct {
 	Templates []Template
